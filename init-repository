@@ -102,6 +102,9 @@ Options:
         Switch to internal URLs and make use of the Oslo git mirrors.
         (Implies `--mirror').
 
+    --github
+        Use Github hosted git mirrors. (Implies `--mirror`).
+
     --codereview-username <Gerrit/JIRA username>
         Specify the user name for the (potentially) writable `gerrit' remote
         for each module, for use with the Gerrit code review tool.
@@ -137,7 +140,7 @@ Options:
 
         For example:
 
-          --mirror user\@machine:/foo/bar/
+          --mirror user\@machine:/foo/bar/qt
 
         ...will use the following as a mirror for qtbase:
 
@@ -159,10 +162,22 @@ my $GERRIT_SSH_BASE
     = 'ssh://@USER@codereview.qt-project.org@PORT@/';
 
 my $BER_MIRROR_URL_BASE
-    = 'git://hegel/';
+    = 'git://hegel/qt/';
 
 my $OSLO_MIRROR_URL_BASE
-    = 'git://qilin/';
+    = 'git://qilin/qt/';
+
+my $GITHUB_MIRROR_URL_BASE
+    = 'git@github.com:qtproject/';
+
+sub url_path
+{
+    my ($url) = @_;
+    return $1 if ($url =~ m{^file://(.*)$});
+    return $1 if ($url =~ m{^\w+://(?:.+@)*[\w\.]+(?::[\d]+)?/*(.*)$});
+    return $1 if ($url =~ m{^(?:.+@)*[\w\.]+:(.*)$});
+    return $url;
+}
 
 sub new
 {
@@ -229,10 +244,19 @@ sub parse_arguments
         'oslo' => sub {
             $self->{'mirror-url'}        = $OSLO_MIRROR_URL_BASE;
         },
+        'github' => sub {
+            $self->{'mirror-url'}        = $GITHUB_MIRROR_URL_BASE;
+        },
     ) || printUsage(2);
 
-    # Replace any double trailing slashes from end of mirror
-    $self->{'mirror-url'} =~ s{//+$}{/};
+    # Normalize trailing slashes to exactly one
+    $self->{'mirror-url'} =~ s{([^/])/*$}{$1/};
+
+    # Support legacy mirror URLs without explicit namespace
+    if (url_path($self->{'mirror-url'}) eq '/') {
+        print " *** No repository namespace in mirror URL; using default 'qt/'";
+        $self->{'mirror-url'} .= 'qt/';
+    }
 
     $self->{'module-subset'} = [ split(/,/, $self->{'module-subset'}) ];
 
@@ -415,7 +439,10 @@ sub git_clone_one_submodule
     my $url = $self->{'base-url'}.$repo_basename;
     my $mirror;
     if ($mirror_url) {
-        $mirror = $mirror_url.$repo_basename;
+        # mirror URL already contains repo namespace so strip it out
+        my $name = $repo_basename;
+        $name =~ s{.*/}{};
+        $mirror = $mirror_url.$name;
     }
 
     if ($mirror) {
