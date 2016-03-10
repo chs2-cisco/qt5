@@ -546,8 +546,8 @@ sub git_clone_one_submodule
 
     if ($mirror) {
         # Only use the mirror if it can be reached.
-        eval { $self->exe('git', 'ls-remote', $mirror, 'test/if/mirror/exists') };
-        if ($@) {
+        qx(git ls-remote $mirror test/if/mirror/exists 2>&1);
+        if ($?) {
             warn "mirror [$mirror] is not accessible; $url will be used\n";
             undef $mirror;
         }
