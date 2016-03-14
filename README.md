@@ -1,11 +1,14 @@
 # Qt5 for Broadsoft UC One
 
 This repository contains acute patches for the Qt5 needed by UC One.
+To get started, clone this repository:
+
+    git clone git@github.com:Broadsoft/qt5.git
 
 We will use Qt projects `init-repository` for setting up the submodules. This script should be always run in the branch `ucone/dev`.
 The script expects that the remote *origin* points to official Qt repositories.
 
-If you just cloned this repository, please fix this by:
+Please fix this by:
 
     cd qt5
 
@@ -23,6 +26,9 @@ the init script will automatically fall-back to the official
 Qt repositories (based on remote *origin*).
 
 Once you have successfully cloned the submodules, you can proceed to
-checkout the version branch e.g. `ucone/5.5.1`.
+checkout the version branch e.g. for `ucone/5.5.1`:
+
+    git checkout ucone/5.5.1
+    git submodule update --recursive
 
 Otherwise please refer to the Qt project [README](README)
