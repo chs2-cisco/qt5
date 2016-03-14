@@ -17,7 +17,7 @@ Please fix this by:
 
 Then run the `init-repository` script using switch *mirror* e.g:
 
-    perl init-repository --mirror "git@github.com/Broadsoft/"
+    perl init-repository --mirror "git@github.com:Broadsoft/"
 
 This will setup the submodule URLs and clone all the submodules.
 The remote *mirror* is used as the primary source for clones. If some
