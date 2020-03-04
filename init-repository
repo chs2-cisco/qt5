@@ -32,6 +32,19 @@
 ##
 #############################################################################
 
+# Silence ugly errors if mirror is not available
+# This error is not fatal and the warning yielded should be enough.
+#
+# Mar 10, 2016, Jukka Lehtniemi (Cisco Systems, Inc.)
+
+# Init repository for Github mirror
+#
+# Qt project repositories are mirrored to Github but they
+# use different namespace than on other mirrors. This change
+# makes it possible to fetch submodules from Github.
+#
+# Mar 1, 2016, Jukka Lehtniemi (Cisco Systems, Inc.)
+
 use v5.8;
 use strict;
 use warnings;
